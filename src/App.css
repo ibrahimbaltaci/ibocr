@@ -5,7 +5,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Ekranın tamamını kaplaması için min-height kullanıldı */
+  min-height: 100vh;
   margin: 0;
 }
 
@@ -16,8 +16,10 @@ body {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
-  flex-direction: column; /* İçeriği dikey düzende göstermek için */
-  align-items: center; /* İçeriği dikeyde ortalamak için */
+  flex-direction: column;
+  align-items: center;
+  max-width: 80%; /* Geniş ekranlarda içeriğin maksimum genişliği sınırlı olsun */
+  margin: 0 auto; /* Sayfayı yatayda ortala */
 }
 
 input[type="file"], select {
@@ -25,10 +27,12 @@ input[type="file"], select {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  width: 100%; /* Geniş ekranlarda tam genişlik almasını sağlar */
+  max-width: 400px; /* Maksimum genişliği sınırlar */
 }
 
 img {
-  max-width: 100%; /* Resmi ekranın genişliğine sığdırmak için */
+  max-width: 100%;
   height: auto;
   margin-right: 50px;
   border: 1px solid #ccc;
@@ -37,7 +41,8 @@ img {
 }
 
 p {
-  width: 50vw;
+  width: 100%; /* Geniş ekranlarda tam genişlik almasını sağlar */
+  max-width: 600px; /* Maksimum genişliği sınırlar */
   margin: 10px auto;
   font-size: 16px;
 }
@@ -45,6 +50,8 @@ p {
 .display-flex {
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* Küçük ekranlarda bileşenlerin alt alta yerleştirilmesini sağlar */
+  justify-content: center;
 }
 
 .recognized-text-container {
@@ -53,7 +60,8 @@ p {
   border-radius: 5px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   margin: 10px;
-  width: 50vw;
+  width: 100%; /* Geniş ekranlarda tam genişlik almasını sağlar */
+  max-width: 600px; /* Maksimum genişliği sınırlar */
 }
 
 button {
@@ -81,7 +89,8 @@ button:hover {
   border-radius: 10px;
   overflow: hidden;
   margin: 20px 0;
-  max-width: 50vw;
+  max-width: 100%; /* Geniş ekranlarda tam genişlik almasını sağlar */
+  max-width: 600px; /* Maksimum genişliği sınırlar */
 }
 
 .progress {
