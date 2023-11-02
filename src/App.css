@@ -1,35 +1,92 @@
+/* app.css */
+
 body {
-  background-color: aliceblue;
+  background-color: #f7f7f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ekranın tamamını kaplaması için min-height kullanıldı */
+  margin: 0;
 }
+
 .App {
+  padding: 20px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column; /* İçeriği dikey düzende göstermek için */
+  align-items: center; /* İçeriği dikeyde ortalamak için */
+}
+
+input[type="file"], select {
+  margin: 10px 0;
   padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
-input {
-  margin-bottom: 5px;
-}
+
 img {
-  width: 30vw;
+  max-width: 100%; /* Resmi ekranın genişliğine sığdırmak için */
   height: auto;
   margin-right: 50px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 p {
   width: 50vw;
+  margin: 10px auto;
+  font-size: 16px;
 }
+
 .display-flex {
   display: flex;
+  align-items: center;
 }
+
+.recognized-text-container {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  margin: 10px;
+  width: 50vw;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
 .progress-label {
-  margin-bottom: 5px;
+  margin: 10px 0;
+  font-size: 16px;
 }
+
 .progress-bar {
-  background-color: rgb(232, 232, 232);
+  background-color: #eee;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin: 20px 0;
   max-width: 50vw;
 }
+
 .progress {
-  background-color: rgb(0, 255, 170);
-  width: 0%;
+  background-color: #4caf50;
+  width: 0;
   height: 10px;
+  transition: width 0.5s ease;
 }
