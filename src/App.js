@@ -1,23 +1,60 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import { createWorker } from "tesseract.js";
+import "./App.css";
 
 function App() {
+  const [ocr, setOcr] = useState("");
+  const [imageData, setImageData] = useState(null);
+
+  useEffect(() => {
+    const convertImageToText = async () => {
+      if (!imageData) return;
+      const worker = createWorker({
+        logger: (m) => {
+          console.log(m);
+        },
+      });
+
+      await worker.load();
+      await worker.loadLanguage("eng");
+      await worker.initialize("eng");
+      const { data: { text } } = await worker.recognize(imageData);
+      setOcr(text);
+
+      await worker.terminate();
+    };
+
+    convertImageToText();
+  }, [imageData]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const imageDataUri = reader.result;
+      console.log({ imageDataUri });
+      setImageData(imageDataUri);
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        <p>Choose an Image</p>
+        <input
+          type="file"
+          name=""
+          id=""
+          onChange={handleImageChange}
+          accept="image/*"
+        />
+      </div>
+      <div className="display-flex">
+        <img src={imageData} alt="" />
+        <p>{ocr}</p>
+      </div>
     </div>
   );
 }
