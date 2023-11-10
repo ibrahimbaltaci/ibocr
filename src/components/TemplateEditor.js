@@ -1,56 +1,17 @@
-// TemplateEditor.js
+import React from 'react';
 
-import React, { useState } from 'react';
-import CoordinatesSelector from './CoordinateSelector';
-
-const TemplateEditor = ({ onChange }) => {
-    const [template, setTemplate] = useState([]);
-    const [selectedCoordinates, setSelectedCoordinates] = useState(null);
-
-    const handleAddField = () => {
-        if (selectedCoordinates) { // Eklenen satır
-            const newTemplate = [
-                ...template,
-                { id: Date.now(), label: '', coordinates: { ...selectedCoordinates } }
-            ];
-            setTemplate(newTemplate);
-            onChange(newTemplate);
-        }
-    };
-
-    const handleRemoveField = (fieldId) => {
-        const newTemplate = template.filter((field) => field.id !== fieldId);
-        setTemplate(newTemplate);
-        onChange(newTemplate);
-    };
-
-    const handleLabelChange = (fieldId, newLabel) => {
-        const newTemplate = template.map((field) =>
-            field.id === fieldId ? { ...field, label: newLabel } : field
-        );
-        setTemplate(newTemplate);
-        onChange(newTemplate);
-    };
-
-    const handleCoordinatesChange = (fieldId, coordinates) => {
-        const newTemplate = template.map((field) =>
-            field.id === fieldId ? { ...field, coordinates } : field
-        );
-        setTemplate(newTemplate);
-        onChange(newTemplate);
-    };
-
+const TemplateEditor = ({ template }) => {
     return (
         <div>
             <h2>Template Editor</h2>
-            {template.map((field) => (
-                <div key={field.id}>
+            {template.map((field, index) => (
+                <div key={index}>
                     <label>
                         Label:
                         <input
                             type="text"
                             value={field.label}
-                            onChange={(e) => handleLabelChange(field.id, e.target.value)}
+                            onChange={(e) => console.log(e.target.value)}
                         />
                     </label>
                     <label>
@@ -59,23 +20,32 @@ const TemplateEditor = ({ onChange }) => {
                             type="text"
                             placeholder="x1"
                             value={field.coordinates.x1}
-                            onChange={(e) =>
-                                handleCoordinatesChange(field.id, {
-                                    ...field.coordinates,
-                                    x1: parseInt(e.target.value, 10) || 0,
-                                })
-                            }
+                            onChange={(e) => console.log(e.target.value)}
                         />
-                        {/* ... (diğer koordinat inputları için aynı yapı) */}
+                        <input
+                            type="text"
+                            placeholder="y1"
+                            value={field.coordinates.y1}
+                            onChange={(e) => console.log(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder="x2"
+                            value={field.coordinates.x2}
+                            onChange={(e) => console.log(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder="y2"
+                            value={field.coordinates.y2}
+                            onChange={(e) => console.log(e.target.value)}
+                        />
                     </label>
-                    <button onClick={() => handleRemoveField(field.id)}>Remove</button>
+                    <button onClick={() => console.log('Remove button clicked')}>Remove</button>
                 </div>
             ))}
-            <button onClick={handleAddField}>Add Field</button>
-            <CoordinatesSelector onSelection={handleAddField} />
         </div>
     );
-
 };
 
 export default TemplateEditor;

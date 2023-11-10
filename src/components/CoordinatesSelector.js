@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './CoordinatesSelector.css';
 
-const CoordinatesSelector = ({ onSelection }) => {
+const CoordinatesSelector = ({ imageData, onSelection }) => {
     const [startX, setStartX] = useState(null);
     const [startY, setStartY] = useState(null);
     const [endX, setEndX] = useState(null);
@@ -66,7 +66,11 @@ const CoordinatesSelector = ({ onSelection }) => {
     }, [handleMouseDown]);
 
     return (
-        <div ref={containerRef} className="coordinates-selector">
+        <div
+            ref={containerRef}
+            className="coordinates-selector"
+            style={{ backgroundImage: `url(${imageData})` }}
+        >
             {selecting && (
                 <div
                     className="selection-box"

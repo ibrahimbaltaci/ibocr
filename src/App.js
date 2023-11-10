@@ -1,84 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
 import { createWorker } from 'tesseract.js';
-import './App.css'
-import TemplateEditor from "./components/TemplateEditor";
-import CoordinatesSelector from "./components/CoordinateSelector";
-import languages from "./assets/languages";
+import CoordinatesSelector from './components/CoordinatesSelector';
+import TemplateEditor from './components/TemplateEditor';
+import languages from './assets/languages'
 
-function App() {
-  const [ocr, setOcr] = useState("");
+const App = () => {
   const [imageData, setImageData] = useState(null);
-  const [recognizedText, setRecognizedText] = useState("");
-  const [lang, setLang] = useState("eng");
-  const [selectedCoordinates, setSelectedCoordinates] = useState(null); // Eklenen satır
+  const [selectedCoordinates, setSelectedCoordinates] = useState(null);
+  const [template, setTemplate] = useState([]);
+  const [lang, setLang] = useState('eng');
 
   useEffect(() => {
     const convertImageToText = async () => {
-      if (!imageData) return;
-      const worker = await createWorker(lang);
-      const ret = await worker.recognize(imageData);
-      const text = ret.data.text;
-      console.log(text);
-      setRecognizedText(text); // Sonucu state'e kaydettik
+      if (!imageData || !selectedCoordinates) return;
+
+      const worker = createWorker();
+      await worker.load();
+      await worker.loadLanguage(lang);
+      await worker.initialize(lang);
+      const {
+        data: { text },
+      } = await worker.recognize(imageData, {
+        rectangle: selectedCoordinates,
+      });
+
+      setTemplate((prevTemplate) => [
+        ...prevTemplate,
+        { label: '', coordinates: selectedCoordinates, ocrText: text },
+      ]);
+
       await worker.terminate();
     };
 
     convertImageToText();
-  }, [imageData, imageData, lang]);
-
-  const handleLanguageChange = (e) => {
-    const lang = e.target.value;
-    setLang(lang);
-  };
+  }, [imageData, selectedCoordinates, lang]);
 
   const handleImageChange = (file) => {
     if (!file) return;
+
     const reader = new FileReader();
     reader.onloadend = () => {
-      const imageData = reader.result;
-      setImageData(imageData);
+      const imageDataUri = reader.result;
+      setImageData(imageDataUri);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleSelection = (coordinates) => {
-    setSelectedCoordinates(coordinates);
+  const handleLanguageChange = (e) => {
+    setLang(e.target.value);
   };
 
   return (
-    <div className="App">
-      <div>
-        <p>Choose Language:</p>
-        <select value={lang} onChange={handleLanguageChange}>
-          {languages.map((language) => (
-            <option key={language.code} value={language.code}>
-              {language.name}
-            </option>
-          ))}
-        </select>
-        <p>Choose an Image</p>
-        <input
-          type="file"
-          name=""
-          id=""
-          onChange={(e) => handleImageChange(e.target.files[0])}
-          accept="image/*"
-        />
-        <div className="image-preview-container">
-          {imageData && <img src={imageData} alt="" />}
-          {imageData && <CoordinatesSelector onSelection={handleSelection} />}
-        </div>
-      </div>
-      <div>
-        {imageData && selectedCoordinates && (
-          <TemplateEditor
-            selectedCoordinates={selectedCoordinates}
-            onChange={(newTemplate) => console.log(newTemplate)}
+    <div>
+      <h1>OCR Template Builder</h1>
+      <p>Choose Language:</p>
+      <select value={lang} onChange={handleLanguageChange}>
+        {languages.map((language) => (
+          <option key={language.code} value={language.code}>
+            {language.name}
+          </option>
+        ))}
+      </select>
+      <input
+        type="file"
+        onChange={(e) => handleImageChange(e.target.files[0])}
+        accept="image/*"
+      />
+      {imageData && (
+        <div>
+          <CoordinatesSelector
+            imageData={imageData}
+            onSelection={setSelectedCoordinates}
           />
-        )}
-      </div>
+          <TemplateEditor template={template} />
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default App;
