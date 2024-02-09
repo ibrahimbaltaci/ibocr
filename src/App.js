@@ -3,30 +3,47 @@ import { createWorker } from 'tesseract.js';
 import CoordinatesSelector from './components/CoordinatesSelector';
 import TemplateEditor from './components/TemplateEditor';
 import languages from './assets/languages'
+import Jimp from 'jimp';
 
 const App = () => {
   const [imageData, setImageData] = useState(null);
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [template, setTemplate] = useState([]);
   const [lang, setLang] = useState('eng');
+  const jimp = require('jimp');
 
   useEffect(() => {
     const convertImageToText = async () => {
       if (!imageData || !selectedCoordinates) return;
 
-      const worker = createWorker();
-      await worker.load();
-      await worker.loadLanguage(lang);
-      await worker.initialize(lang);
-      const {
-        data: { text },
-      } = await worker.recognize(imageData, {
-        rectangle: selectedCoordinates,
-      });
+      const getCroppedImage = async (imageSrc, crop) => {
+        try {
+          Jimp.read(imageSrc)
+            .then((image) => {
+              const croppedImage = image.clone().crop(crop.x, crop.y, crop.width, crop.height);
+            })
+            .catch((err) => {
+              // Handle an exception.
+            });
+
+          const buffer = await croppedImage.getBufferAsync(Jimp.AUTO);
+
+          return buffer;
+        } catch (error) {
+          console.error('Error processing image:', error);
+          throw error;
+        }
+      };
+
+      // Kırpılan resmi al
+      const croppedImage = await getCroppedImage(imageData, selectedCoordinates);
+      const worker = await createWorker(lang)
+
+      const ret = await worker.recognize(croppedImage)
 
       setTemplate((prevTemplate) => [
         ...prevTemplate,
-        { label: '', coordinates: selectedCoordinates, ocrText: text },
+        { label: '', coordinates: selectedCoordinates, ocrText: ret.data.text }, // Düzeltildi
       ]);
 
       await worker.terminate();
@@ -49,6 +66,7 @@ const App = () => {
   const handleLanguageChange = (e) => {
     setLang(e.target.value);
   };
+
 
   return (
     <div>
@@ -74,6 +92,7 @@ const App = () => {
           />
           <TemplateEditor template={template} />
         </div>
+
       )}
     </div>
   );
