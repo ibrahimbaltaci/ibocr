@@ -22,7 +22,7 @@ const App = () => {
     // Görüntüyü siyah beyaz yap
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
-    
+
     for (let i = 0; i < data.length; i += 4) {
       const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
       // Eşik değeri ile siyah beyaz dönüşümü
@@ -30,13 +30,13 @@ const App = () => {
       const value = avg > threshold ? 255 : 0;
       data[i] = data[i + 1] = data[i + 2] = value;
     }
-    
+
     ctx.putImageData(imageData, 0, 0);
 
     // Keskinleştirme filtresi
     ctx.filter = 'contrast(1.4) brightness(1.1) saturate(1.2)';
     ctx.drawImage(canvas, 0, 0);
-    
+
     // Filtreleri sıfırla
     ctx.filter = 'none';
   };
@@ -46,7 +46,7 @@ const App = () => {
       const worker = await createWorker();
       await worker.loadLanguage(lang);
       await worker.initialize(lang);
-      
+
       // Önce sayfa düzenini analiz et
       await worker.setParameters({
         tessedit_pageseg_mode: PSM.AUTO,
@@ -56,11 +56,11 @@ const App = () => {
 
       const { data } = await worker.recognize(imageData);
       const { hocr, tsv } = data;
-      
+
       // HOCR'dan metin bölgelerini çıkar
       const parser = new DOMParser();
       const doc = parser.parseFromString(hocr, 'text/html');
-      
+
       // Satır seviyesinde bölgeleri al
       const lines = Array.from(doc.getElementsByClassName('ocr_line'));
       const regions = [];
@@ -88,7 +88,7 @@ const App = () => {
 
         const [, x1, y1, x2, y2] = bbox.map(Number);
         const words = Array.from(line.getElementsByClassName('ocrx_word'));
-        
+
         // Satırdaki kelimelerin ortalama güven skorunu hesapla
         let totalConfidence = 0;
         let wordCount = 0;
@@ -106,7 +106,7 @@ const App = () => {
         });
 
         const averageConfidence = wordCount > 0 ? totalConfidence / wordCount : 0;
-        
+
         // Minimum güven skoruna ve boyuta sahip satırları filtrele
         const minWidth = 20;  // minimum 20 piksel genişlik
         const minHeight = 10; // minimum 10 piksel yükseklik
@@ -138,7 +138,7 @@ const App = () => {
   const handleOCR = async (selection = null) => {
     const targetSelection = selection || pendingSelection;
     if (!imageData || !targetSelection) return;
-    
+
     setIsProcessing(true);
     setError(null);
 
@@ -153,11 +153,11 @@ const App = () => {
         const scale = 3; // 3x büyütme
         canvas.width = targetSelection.width * scale;
         canvas.height = targetSelection.height * scale;
-        
+
         // Görüntü işleme ayarları
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-        
+
         ctx.drawImage(
           img,
           targetSelection.x,
@@ -176,7 +176,7 @@ const App = () => {
         try {
           // OCR işlemi
           const worker = await createWorker();
-          
+
           // OCR ayarları
           await worker.loadLanguage(lang);
           await worker.initialize(lang);
@@ -204,7 +204,7 @@ const App = () => {
           });
 
           const result = await worker.recognize(canvas.toDataURL('image/png'));
-          
+
           // Sonucu temizle ve düzenle
           const cleanText = result.data.text
             .trim()
@@ -256,7 +256,7 @@ const App = () => {
       // Daha geniş dil desteği için multi-language modeli kullan
       await worker.loadLanguage('osd');
       await worker.initialize('osd');
-      
+
       const { data: { text } } = await worker.recognize(imageData);
       await worker.terminate();
 
@@ -301,7 +301,7 @@ const App = () => {
       // En yüksek skora sahip dili seç
       let bestLang = 'eng';
       let bestScore = 0;
-      
+
       languageScores.forEach((score, lang) => {
         // Eğer dil Tesseract tarafından destekleniyorsa değerlendir
         if (languageMap[lang]) {
@@ -358,7 +358,7 @@ const App = () => {
       'swedish': 'swe',
       'thai': 'tha'
     };
-    
+
     return languageMapping[detectedLang.toLowerCase()] || null;
   };
 
@@ -417,10 +417,10 @@ const App = () => {
 
       // Resmi base64'e çevir
       const base64Image = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
+        const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
-    reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
       });
 
       setImageData(base64Image);
@@ -433,7 +433,7 @@ const App = () => {
 
       // Metin bölgelerini tespit et
       const regions = await detectTextRegions(base64Image);
-      
+
       // Her bölge için OCR işlemi yap
       const totalRegions = regions.length;
       console.log(`Tespit edilen bölge sayısı: ${totalRegions}`);
@@ -441,7 +441,7 @@ const App = () => {
       for (let i = 0; i < totalRegions; i++) {
         const region = regions[i];
         console.log(`Bölge ${i + 1} işleniyor:`, region);
-        
+
         await handleOCR({
           ...region,
           canvasWidth: 800,
@@ -478,7 +478,7 @@ const App = () => {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>IBO OCR</h1>
+        <h1>IBOCR</h1>
         <p className="subtitle">Resim Üzerinde Metin Tanıma</p>
       </header>
 
@@ -492,22 +492,22 @@ const App = () => {
               onChange={handleLanguageChange}
               className={`select-input ${detectedLanguage === lang ? 'detected-language' : ''}`}
             >
-        {languages.map((language) => (
-          <option key={language.code} value={language.code}>
+              {languages.map((language) => (
+                <option key={language.code} value={language.code}>
                   {language.name} {detectedLanguage === language.code ? '(Tespit Edilen)' : ''}
-          </option>
-        ))}
-      </select>
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="file-upload">
             <label htmlFor="image-upload" className="upload-button">
               Resim Yükle
-      <input
+              <input
                 id="image-upload"
-        type="file"
+                type="file"
                 onChange={handleImageChange}
-        accept="image/*"
+                accept="image/*"
                 className="hidden-input"
               />
             </label>
@@ -516,18 +516,18 @@ const App = () => {
 
         {error && <div className="error-message">{error}</div>}
 
-      {imageData && (
+        {imageData && (
           <div className="image-processing-section">
-          <CoordinatesSelector
-            imageData={imageData}
+            <CoordinatesSelector
+              imageData={imageData}
               onSelection={handleSelectionChange}
               isProcessing={isProcessing}
               selectedAreas={template.map(item => item.coordinates)}
               pendingSelection={pendingSelection}
             />
-            
+
             {pendingSelection && !isProcessing && (
-              <button 
+              <button
                 onClick={() => handleOCR()}
                 className="recognize-button"
               >
@@ -537,7 +537,7 @@ const App = () => {
 
             {isProcessing && autoDetectProgress > 0 && (
               <div className="progress-bar">
-                <div 
+                <div
                   className="progress-fill"
                   style={{ width: `${autoDetectProgress}%` }}
                 />
@@ -551,20 +551,20 @@ const App = () => {
               <div className="results-section">
                 <div className="results-header">
                   <h2>Tanınan Metinler</h2>
-                  <button 
+                  <button
                     onClick={handleClearSelections}
                     className="clear-button"
                   >
                     Tümünü Temizle
                   </button>
                 </div>
-                <TemplateEditor 
-                  template={template} 
+                <TemplateEditor
+                  template={template}
                   onDelete={handleDeleteSelection}
                 />
               </div>
             )}
-        </div>
+          </div>
         )}
 
         {isProcessing && (
